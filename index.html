@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espaço Beauty & Hair - Agendamento Online</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f472b6',
+                            400: '#ec4899',
+                            500: '#db2777',
+                            600: '#be185d',
+                            700: '#9d174d',
+                            800: '#831843',
+                            900: '#701a75',
+                            950: '#4a044e',
+                            dark: '#3b0764'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Supabase JS Client via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fdf8fa;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdf2f8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6;
+            border-radius: 10px;
+        }
+        .glow-effect {
+            filter: drop-shadow(0 0 8px rgba(219, 39, 119, 0.45));
+        }
+    </style>
+</head>
+<body class="text-pink-950 antialiased min-h-screen flex flex-col justify-between" x-data="supabaseBookingApp()" x-init="initApp()">
+
+    <!-- NAVEGAÇÃO / HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-pink-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            
+            <!-- LOGO ESPAÇO BEAUTY -->
+            <div class="flex items-center gap-3 cursor-pointer" @click="currentView = 'booking'">
+                <div class="relative w-12 h-12 rounded-full border-2 border-pink-500 flex items-center justify-center p-0.5 bg-white shadow-sm overflow-hidden group">
+                    <img 
+                        src="logo.png" 
+                        alt="Espaço Beauty Logo" 
+                        class="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    />
+                    
+                </div>
+                <div>
+                    <span class="block text-xl font-bold tracking-tight text-pink-900 leading-none serif-title">
+                      Bruna Fellipe   <span class="text-xs font-normal font-sans italic text-pink-600 tracking-normal"> </span>
+                    </span>
+                    <span class="text-[10px] uppercase tracking-widest text-pink-600/80 font-semibold block mt-0.5">Maquiadora💫</span>
+                </div>
+            </div>
+
+            <!-- NAVEGAÇÃO -->
+            <div class="flex items-center gap-2">
+                <button 
+                    @click="currentView = 'booking'" 
+                    :class="currentView === 'booking' ? 'bg-pink-100 text-pink-950 font-bold' : 'text-pink-800 hover:text-pink-700'"
+                    class="px-3 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-plus text-pink-600"></i>
+                    <span>Agendar</span>
+                </button>
+                
+                <button 
+                    @click="openAdminTab()" 
+                    :class="currentView === 'admin' ? 'bg-pink-100 text-pink-950 font-bold' : 'text-pink-800 hover:text-pink-700'"
+                    class="px-3 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-pink-600"></i>
+                    <span>Painel</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow">
+
+        <!-- ================= VISÃO 1: FLUXO DE AGENDAMENTO CLIENTE ================= -->
+        <template x-if="currentView === 'booking'">
+            <div>
+                
+                <!-- HERO BANNER ROSA FORTE COM FOTO -->
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-900 via-pink-800 to-pink-700 text-white p-6 sm:p-8 mb-8 shadow-xl shadow-pink-900/20 border border-pink-600/50 flex flex-col-reverse md:flex-row items-center justify-between gap-6">
+                    <div class="relative z-10 max-w-md text-center md:text-left">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 backdrop-blur-md text-pink-100 mb-3 border border-white/25">
+                            <i class="fa-solid fa-sparkles text-pink-200"></i> Agendamentos
+                        </span>
+                        <h1 class="text-2xl sm:text-4xl font-bold serif-title tracking-wide mb-2">Reserve seu horário online</h1>
+                        <p class="text-pink-100 text-xs sm:text-sm font-light">
+                          Escolha o procedimento desejado e reserve seu horário. Atendimentos regulares às sextas e aos sábados.
+                        </p>
+                    </div>
+
+                    <!-- BANNER FOTO -->
+                    <div class="relative z-10 w-48 sm:w-56 md:w-64 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-pink-300/40 shadow-2xl flex-shrink-0 bg-pink-950/50">
+                        <img 
+                            src="fotobruna.png" 
+                            alt="Espaço Beauty" 
+                            class="w-full h-full object-cover object-center"
+                            onerror="this.src='fotobruna.png';"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-pink-950/40 via-transparent to-transparent pointer-events-none"></div>
+                    </div>
+                </div>
+
+                <!-- AVISO DE REGRAS E TAXAS -->
+                <div class="bg-pink-100 border-l-4 border-pink-600 p-4 mb-8 rounded-r-2xl shadow-sm text-xs sm:text-sm text-pink-950 space-y-2">
+                    <div class="flex items-center gap-2 font-bold text-pink-950 text-sm">
+                        <i class="fa-solid fa-circle-info text-pink-600"></i> Informações Sobre Nossos Horários:
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-pink-900 pl-1">
+                        <li><strong>Segunda a Quinta:</strong> Agenda fechada para público geral.</li>
+                        <li><strong>Sexta:</strong> Atendimento regular das 09h às 19h | <strong>Sábado:</strong> das 07h às 19h.</li>
+                        <li><strong>Domingos, Feriados e fora do horário comercial:</strong> Produções sob agendamento especial com <strong>taxa adicional de 15%</strong>.</li>
+                        <li><strong>Horários esporádicos fora da agenda:</strong> Podem ser solicitados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
+                        <li><strong>Noivas e Debutantes de cerimônia:</strong> Orçamentos personalizados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
+                    </ul>
+                </div>
+
+                <!-- STEPPER DE ETAPAS -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between relative max-w-2xl mx-auto px-2">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-pink-200 rounded-full z-0"></div>
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-pink-600 rounded-full transition-all duration-500 z-0"
+                             :style="`width: ${((step - 1) / 3) * 100}%`"></div>
+
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all shadow-md"
+                                 :class="step >= 1 ? 'bg-pink-600 text-white ring-4 ring-pink-100' : 'bg-pink-200 text-pink-700'">
+                                <template x-if="step > 1"><i class="fa-solid fa-check"></i></template>
+                                <template x-if="step <= 1"><span>1</span></template>
+                            </div>
+                            <span class="text-[11px] font-semibold mt-1 text-pink-900 hidden sm:block">Serviço</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all shadow-md"
+                                 :class="step >= 2 ? 'bg-pink-600 text-white ring-4 ring-pink-100' : 'bg-pink-200 text-pink-700'">
+                                <template x-if="step > 2"><i class="fa-solid fa-check"></i></template>
+                                <template x-if="step <= 2"><span>2</span></template>
+                            </div>
+                            <span class="text-[11px] font-semibold mt-1 text-pink-900 hidden sm:block">Data & Hora</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all shadow-md"
+                                 :class="step >= 3 ? 'bg-pink-600 text-white ring-4 ring-pink-100' : 'bg-pink-200 text-pink-700'">
+                                <template x-if="step > 3"><i class="fa-solid fa-check"></i></template>
+                                <template x-if="step <= 3"><span>3</span></template>
+                            </div>
+                            <span class="text-[11px] font-semibold mt-1 text-pink-900 hidden sm:block">Seus Dados</span>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col items-center">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all shadow-md"
+                                 :class="step >= 4 ? 'bg-pink-600 text-white ring-4 ring-pink-100' : 'bg-pink-200 text-pink-700'">
+                                <span>4</span>
+                            </div>
+                            <span class="text-[11px] font-semibold mt-1 text-pink-900 hidden sm:block">Confirmação</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASSO 1: SELEÇÃO DO SERVIÇO -->
+                <div x-show="step === 1" x-transition:enter="transition ease-out duration-300 opacity-0 translate-y-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-pink-950 serif-title">Selecione o Procedimento</h2>
+                            <p class="text-xs text-pink-700">Escolha o serviço desejado para conferir os horários disponíveis.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <template x-for="service in services" :key="service.id">
+                            <div 
+                                @click="selectService(service)"
+                                :class="selectedService?.id === service.id ? 'border-pink-600 ring-2 ring-pink-500/30 bg-pink-50 shadow-lg' : 'border-pink-200 bg-white hover:border-pink-400 hover:shadow-md'"
+                                class="rounded-2xl p-5 border transition-all duration-200 cursor-pointer relative flex flex-col justify-between group">
+                                
+                                <div>
+                                    <div class="flex justify-between items-start gap-2 mb-2">
+                                        <h3 class="font-bold text-pink-950 text-base group-hover:text-pink-700 transition-colors" x-text="service.title"></h3>
+                                        <span class="font-bold text-pink-700 text-base whitespace-nowrap" x-text="formatCurrency(service.price)"></span>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 text-xs font-medium text-pink-600 mb-3">
+                                        <span class="inline-flex items-center gap-1 bg-pink-100 px-2.5 py-1 rounded-md text-pink-950 font-semibold">
+                                            <i class="fa-regular fa-clock text-pink-600"></i>
+                                            <span x-text="service.durationText"></span>
+                                        </span>
+                                    </div>
+
+                                    <p class="text-xs text-pink-900/80 leading-relaxed line-clamp-3 mb-4" x-text="service.description"></p>
+                                </div>
+
+                                <div class="pt-3 border-t border-pink-100 flex items-center justify-between">
+                                    <button 
+                                        type="button"
+                                        @click.stop="openModal(service)"
+                                        class="text-xs text-pink-700 hover:text-pink-900 font-medium underline flex items-center gap-1">
+                                        <i class="fa-regular fa-circle-info"></i> Detalhes
+                                    </button>
+
+                                    <!-- BOTÃO COM COR ROSA ESCURA E CONTRASTE COM TEXTO BRANCO -->
+                                    <span 
+                                        :class="selectedService?.id === service.id ? 'bg-pink-700 text-white shadow' : 'bg-pink-200 text-pink-950 group-hover:bg-pink-600 group-hover:text-white'"
+                                        class="text-xs px-3.5 py-2 rounded-xl font-bold transition-all flex items-center gap-1 shadow-sm">
+                                        <span x-text="selectedService?.id === service.id ? 'Selecionado' : 'Selecionar'"></span>
+                                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button 
+                            @click="goToStep2()" 
+                            :disabled="!selectedService"
+                            :class="selectedService ? 'bg-pink-700 hover:bg-pink-800 text-white shadow-lg shadow-pink-700/30 font-bold' : 'bg-pink-200 text-pink-500 cursor-not-allowed'"
+                            class="px-6 py-3.5 rounded-2xl text-xs sm:text-sm transition-all flex items-center gap-2">
+                            <span>Avançar para Data e Horário</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PASSO 2: ESCOLHA DE DATA E HORÁRIO -->
+                <div x-show="step === 2" x-transition:enter="transition ease-out duration-300 opacity-0 translate-y-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-pink-950 serif-title">Escolha a Data e Horário</h2>
+                            <p class="text-xs text-pink-700">
+                                Atendimento regular: <span class="font-bold text-pink-800">Sexta (09h-19h)</span> e <span class="font-bold text-pink-800">Sábado (07h-19h)</span>. 
+                                Domingos e Feriados possuem taxa de +15%.
+                            </p>
+                        </div>
+                        <button @click="step = 1" class="text-xs text-pink-700 font-semibold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar aos Serviços
+                        </button>
+                    </div>
+
+                    <!-- CARD DO SERVIÇO SELECIONADO -->
+                    <div class="bg-pink-100/70 border border-pink-300 rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-pink-700 text-white flex items-center justify-center font-bold text-lg shadow">
+                                💄
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-pink-950 text-sm" x-text="selectedService?.title"></h4>
+                                <p class="text-xs text-pink-800" x-text="`Duração: ${selectedService?.durationText} (${selectedService?.durationMinutes} min) • Base: ${formatCurrency(selectedService?.price || 0)}`"></p>
+                            </div>
+                        </div>
+
+                        <template x-if="selectedTime">
+                            <div class="bg-white px-3 py-1.5 rounded-xl border border-pink-300 text-xs font-semibold text-pink-950 shadow-sm">
+                                <i class="fa-regular fa-clock text-pink-600"></i>
+                                Horário: <span x-text="selectedTime"></span> às <span x-text="calculateEndTime(selectedTime, selectedService.durationMinutes)"></span>
+                                <template x-if="hasExtraTax">
+                                    <span class="ml-1 px-1.5 py-0.5 bg-pink-200 text-pink-900 rounded font-bold text-[10px]">+15% Taxa</span>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        
+                        <!-- CALENDÁRIO MENSAL -->
+                        <div class="lg:col-span-7 bg-white p-5 rounded-3xl border border-pink-200 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-pink-950 text-base capitalize" x-text="currentMonthYearName"></h3>
+                                <div class="flex gap-1">
+                                    <button @click="prevMonth()" class="w-8 h-8 rounded-lg hover:bg-pink-100 flex items-center justify-center text-pink-800">
+                                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    </button>
+                                    <button @click="nextMonth()" class="w-8 h-8 rounded-lg hover:bg-pink-100 flex items-center justify-center text-pink-800">
+                                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                                <span class="text-[11px] font-bold text-pink-700">Dom</span>
+                                <span class="text-[11px] font-bold text-pink-400">Seg</span>
+                                <span class="text-[11px] font-bold text-pink-400">Ter</span>
+                                <span class="text-[11px] font-bold text-pink-400">Qua</span>
+                                <span class="text-[11px] font-bold text-pink-400">Qui</span>
+                                <span class="text-[11px] font-bold text-pink-800">Sex</span>
+                                <span class="text-[11px] font-bold text-pink-800">Sáb</span>
+                            </div>
+
+                            <div class="grid grid-cols-7 gap-1 text-center">
+                                <template x-for="blank in calendarBlanks" :key="'b'+blank">
+                                    <div class="h-10"></div>
+                                </template>
+
+                                <template x-for="dayObj in calendarDays" :key="dayObj.dateStr">
+                                    <button 
+                                        @click="onSelectDate(dayObj)"
+                                        :disabled="dayObj.isDisabled"
+                                        :class="{
+                                            'bg-pink-700 text-white font-bold shadow-md shadow-pink-700/30 scale-105': selectedDate === dayObj.dateStr,
+                                            'hover:bg-pink-100 hover:text-pink-900 text-pink-950 font-medium': !dayObj.isDisabled && selectedDate !== dayObj.dateStr,
+                                            'text-pink-200 opacity-40 cursor-not-allowed bg-pink-50': dayObj.isDisabled,
+                                            'border-2 border-pink-500': dayObj.isToday && selectedDate !== dayObj.dateStr,
+                                            'bg-pink-100 text-pink-950 border border-pink-300': dayObj.isSunday && !dayObj.isDisabled && selectedDate !== dayObj.dateStr
+                                        }"
+                                        class="h-10 rounded-xl text-xs sm:text-sm flex flex-col items-center justify-center relative transition-all">
+                                        <span x-text="dayObj.dayNumber"></span>
+                                        <template x-if="dayObj.isSunday">
+                                            <span class="text-[8px] font-bold text-pink-700">+15%</span>
+                                        </template>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-pink-100 flex flex-wrap items-center justify-between text-[11px] text-pink-700 gap-2">
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-700"></span> Selecionado</div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full border border-pink-500"></span> Hoje</div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-200"></span> Dom / Feriado (+15%)</div>
+                                <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-100"></span> Fechado (Seg-Qui)</div>
+                            </div>
+                        </div>
+
+                        <!-- SLOTS DE HORÁRIOS -->
+                        <div class="lg:col-span-5 bg-white p-5 rounded-3xl border border-pink-200 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <h3 class="font-bold text-pink-950 text-base">Horários Livres</h3>
+                                    <span x-show="isLoadingSlots" class="text-xs text-pink-600 animate-pulse"><i class="fa-solid fa-spinner fa-spin"></i> Verificando...</span>
+                                </div>
+                                <p class="text-xs text-pink-700 mb-4" x-text="selectedDateFormatted ? `Data: ${selectedDateFormatted}` : 'Selecione uma data no calendário'"></p>
+
+                                <template x-if="!selectedDate">
+                                    <div class="py-12 text-center text-pink-400">
+                                        <i class="fa-regular fa-calendar-days text-3xl mb-2 text-pink-300"></i>
+                                        <p class="text-xs">Clique em uma Sexta, Sábado ou Domingo para carregar os horários.</p>
+                                    </div>
+                                </template>
+
+                                <template x-if="selectedDate">
+                                    <div class="space-y-4 max-h-[340px] overflow-y-auto pr-1">
+                                        <template x-if="availableSlots.length === 0">
+                                            <div class="p-6 text-center text-pink-400 text-xs">
+                                                Nenhum horário livre encontrado para este dia.
+                                            </div>
+                                        </template>
+
+                                        <div class="grid grid-cols-3 gap-2">
+                                            <template x-for="slot in availableSlots" :key="slot">
+                                                <button 
+                                                    @click="selectedTime = slot"
+                                                    :disabled="!getSlotStatus(slot).available"
+                                                    :class="{
+                                                        'bg-pink-700 text-white font-bold ring-2 ring-pink-400 shadow-md': selectedTime === slot,
+                                                        'bg-pink-50 hover:bg-pink-100 text-pink-950 font-semibold border border-pink-300': getSlotStatus(slot).available && selectedTime !== slot,
+                                                        'bg-pink-50 text-pink-300 cursor-not-allowed border-none opacity-60': !getSlotStatus(slot).available
+                                                    }"
+                                                    class="py-2.5 px-2 rounded-xl text-xs transition-all flex flex-col items-center justify-center gap-0.5">
+                                                    <span class="font-bold" x-text="slot"></span>
+                                                    <span class="text-[9px]" x-text="getSlotStatus(slot).reason"></span>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-pink-100 flex justify-between gap-3">
+                                <button @click="step = 1" class="px-4 py-2 rounded-xl border border-pink-300 text-xs font-semibold text-pink-800 hover:bg-pink-50">
+                                    Voltar
+                                </button>
+                                <button 
+                                    @click="step = 3" 
+                                    :disabled="!selectedDate || !selectedTime"
+                                    :class="selectedDate && selectedTime ? 'bg-pink-700 hover:bg-pink-800 text-white shadow-lg shadow-pink-700/30 font-bold' : 'bg-pink-200 text-pink-400 cursor-not-allowed'"
+                                    class="px-5 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                                    <span>Continuar</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- PASSO 3: DADOS DA CLIENTE -->
+                <div x-show="step === 3" x-transition:enter="transition ease-out duration-300 opacity-0 translate-y-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-pink-950 serif-title">Seus Dados de Contato</h2>
+                            <p class="text-xs text-pink-700">Preencha com seus dados para concluir a reserva.</p>
+                        </div>
+                        <button @click="step = 2" class="text-xs text-pink-700 font-semibold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-left"></i> Alterar Horário
+                        </button>
+                    </div>
+
+                    <div class="max-w-xl mx-auto bg-white p-6 sm:p-8 rounded-3xl border border-pink-200 shadow-sm">
+                        <form @submit.prevent="step = 4" class="space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-pink-900 uppercase tracking-wider mb-2">
+                                    Nome Completo *
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-pink-400">
+                                        <i class="fa-regular fa-user"></i>
+                                    </span>
+                                    <input 
+                                        type="text" 
+                                        x-model="clientName" 
+                                        required
+                                        placeholder="Ex: Beatriz Lima"
+                                        class="w-full pl-10 pr-4 py-3 rounded-xl border border-pink-300 focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 outline-none text-xs sm:text-sm transition-all">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-pink-900 uppercase tracking-wider mb-2">
+                                    WhatsApp / Telefone *
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-emerald-600">
+                                        <i class="fa-brands fa-whatsapp"></i>
+                                    </span>
+                                    <input 
+                                        type="tel" 
+                                        x-model="clientPhone" 
+                                        @input="formatPhoneInput($event)"
+                                        required
+                                        placeholder="(00) 90000-0000"
+                                        class="w-full pl-10 pr-4 py-3 rounded-xl border border-pink-300 focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 outline-none text-xs sm:text-sm transition-all">
+                                </div>
+                            </div>
+
+                            <div class="bg-pink-100/70 p-4 rounded-2xl border border-pink-300 text-xs text-pink-950 space-y-1">
+                                <p class="font-bold">Resumo do Agendamento:</p>
+                                <p><span class="font-semibold">Procedimento:</span> <span x-text="selectedService?.title"></span></p>
+                                <p><span class="font-semibold">Data & Horário:</span> <span x-text="`${selectedDateFormatted} às ${selectedTime} (até ${calculateEndTime(selectedTime, selectedService?.durationMinutes)})`"></span></p>
+                                <p><span class="font-semibold">Valor Base:</span> <span x-text="formatCurrency(selectedService?.price || 0)"></span></p>
+                                <template x-if="hasExtraTax">
+                                    <p class="text-pink-900 font-bold"><span class="font-semibold">Taxa Domingos/Feriados (+15%):</span> +<span x-text="formatCurrency((selectedService?.price || 0) * 0.15)"></span></p>
+                                </template>
+                                <p class="pt-1 border-t border-pink-300 text-sm font-extrabold text-pink-950"><span class="font-semibold">Valor Total:</span> <span x-text="formatCurrency(calculateFinalPrice())"></span></p>
+                            </div>
+
+                            <div class="pt-3 flex justify-between gap-3">
+                                <button type="button" @click="step = 2" class="px-5 py-3 border border-pink-300 rounded-xl text-xs font-semibold text-pink-800 hover:bg-pink-50">
+                                    Voltar
+                                </button>
+                                <button 
+                                    type="submit" 
+                                    :disabled="!clientName.trim() || clientPhone.length < 14"
+                                    :class="clientName.trim() && clientPhone.length >= 14 ? 'bg-pink-700 hover:bg-pink-800 text-white shadow-lg shadow-pink-700/30 font-bold' : 'bg-pink-200 text-pink-400 cursor-not-allowed'"
+                                    class="px-6 py-3 rounded-xl text-xs font-semibold transition-all flex items-center gap-2">
+                                    <span>Revisar Agendamento</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PASSO 4: CONFIRMAÇÃO -->
+                <div x-show="step === 4" x-transition:enter="transition ease-out duration-300 opacity-0 translate-y-4">
+                    <div class="max-w-xl mx-auto bg-white rounded-3xl border border-pink-200 shadow-xl overflow-hidden">
+                        
+                        <div class="bg-gradient-to-r from-pink-950 to-pink-900 p-6 text-white text-center relative">
+                            <div class="w-16 h-16 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white flex items-center justify-center text-2xl mx-auto mb-3">
+                                <i class="fa-solid fa-calendar-check text-pink-200"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold serif-title">Confirme seu Agendamento</h2>
+                            <p class="text-pink-100 text-xs mt-1">Sua vaga será reservada e confirmada no sistema!</p>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            
+                            <div class="divide-y divide-pink-100 text-xs sm:text-sm">
+                                <div class="py-3 flex justify-between items-center">
+                                    <span class="text-pink-700 text-xs uppercase font-bold">Serviço</span>
+                                    <span class="font-bold text-pink-950" x-text="selectedService?.title"></span>
+                                </div>
+                                <div class="py-3 flex justify-between items-center">
+                                    <span class="text-pink-700 text-xs uppercase font-bold">Duração</span>
+                                    <span class="font-semibold text-pink-900" x-text="`${selectedService?.durationText}`"></span>
+                                </div>
+                                <div class="py-3 flex justify-between items-center">
+                                    <span class="text-pink-700 text-xs uppercase font-bold">Data & Horário</span>
+                                    <span class="font-bold text-pink-800" x-text="`${selectedDateFormatted} das ${selectedTime} às ${calculateEndTime(selectedTime, selectedService?.durationMinutes)}`"></span>
+                                </div>
+                                <div class="py-3 flex justify-between items-center">
+                                    <span class="text-pink-700 text-xs uppercase font-bold">Cliente</span>
+                                    <span class="font-semibold text-pink-900" x-text="clientName"></span>
+                                </div>
+                                <div class="py-3 flex justify-between items-center">
+                                    <span class="text-pink-700 text-xs uppercase font-bold">WhatsApp</span>
+                                    <span class="font-semibold text-pink-900" x-text="clientPhone"></span>
+                                </div>
+                                <div class="py-4 flex justify-between items-center bg-pink-100/60 -mx-6 px-6 border-t border-b border-pink-200">
+                                    <div>
+                                        <span class="text-pink-950 font-bold block">Valor Total</span>
+                                        <template x-if="hasExtraTax">
+                                            <span class="text-[10px] text-pink-800 font-semibold">(Inclui taxa de 15% para dom/feriado)</span>
+                                        </template>
+                                    </div>
+                                    <span class="text-2xl font-extrabold text-pink-800" x-text="formatCurrency(calculateFinalPrice())"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 pt-2">
+                                <!-- BOTÃO WHATSAPP EM VERDE DE ALTO CONTRASTE OU ROSA ESCURO IMPACTANTE -->
+                                <button 
+                                    @click="saveBookingAndRedirectWhatsApp()"
+                                    :disabled="isSubmitting"
+                                    class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base transition-all shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-3">
+                                    <template x-if="!isSubmitting">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                                            <span>Confirmar e Enviar no WhatsApp</span>
+                                        </div>
+                                    </template>
+                                    <template x-if="isSubmitting">
+                                        <span><i class="fa-solid fa-spinner fa-spin"></i> Agendando...</span>
+                                    </template>
+                                </button>
+
+                                <button 
+                                    @click="step = 3" 
+                                    class="w-full py-2.5 text-xs font-semibold text-pink-700 hover:text-pink-950">
+                                    Editar Informações
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </template>
+
+
+        <!-- ================= VISÃO 2: PAINEL DA PROFISSIONAL ================= -->
+        <template x-if="currentView === 'admin' && isAdminAuthenticated">
+            <div x-transition:enter="transition ease-out duration-300 opacity-0">
+                
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-2xl font-bold text-pink-950 serif-title">Painel de Agendamentos</h2>
+                            <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                                <i class="fa-solid fa-shield-check"></i> Autenticado
+                            </span>
+                        </div>
+                        <p class="text-xs text-pink-700">Gestão completa dos atendimentos e produções.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button 
+                            @click="loadAllBookings()" 
+                            class="px-3 py-2 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-rotate-right"></i> Atualizar
+                        </button>
+                        <button 
+                            @click="isConfigModalOpen = true" 
+                            class="px-3 py-2 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-900 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-database text-emerald-600"></i> Configurar DB
+                        </button>
+                        <button 
+                            @click="isChangePassModalOpen = true" 
+                            class="px-3 py-2 rounded-xl bg-pink-200 hover:bg-pink-300 text-pink-950 border border-pink-300 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-key"></i> Alterar Senha
+                        </button>
+                        <button 
+                            @click="logoutAdmin()" 
+                            class="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-right-from-bracket"></i> Sair / Bloquear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARDS DE MÉTRICAS -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-white p-5 rounded-2xl border border-pink-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-pink-500 uppercase tracking-wider">Total Agendados</span>
+                            <h4 class="text-2xl font-extrabold text-pink-950" x-text="adminBookings.length"></h4>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pink-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-pink-500 uppercase tracking-wider">Faturamento Previsto</span>
+                            <h4 class="text-2xl font-extrabold text-pink-950" x-text="formatCurrency(calculateTotalRevenue())"></h4>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-pink-200 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-semibold text-pink-500 uppercase tracking-wider">Agendamentos Hoje</span>
+                            <h4 class="text-2xl font-extrabold text-pink-950" x-text="todayBookingsCount()"></h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABELA DE AGENDAMENTOS -->
+                <div class="bg-white rounded-3xl border border-pink-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-pink-100 flex items-center justify-between gap-3 bg-pink-50/50">
+                        <h3 class="font-bold text-pink-950 text-sm sm:text-base">Agendamentos Gravados</h3>
+                        <span class="text-xs text-pink-700" x-text="`${adminBookings.length} registro(s)`"></span>
+                    </div>
+
+                    <template x-if="adminBookings.length === 0">
+                        <div class="p-12 text-center text-pink-400">
+                            <i class="fa-solid fa-calendar-xmark text-4xl mb-3 text-pink-300"></i>
+                            <p class="font-semibold text-pink-900 text-base">Nenhum agendamento encontrado.</p>
+                        </div>
+                    </template>
+
+                    <template x-if="adminBookings.length > 0">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="border-b border-pink-100 bg-pink-50/80 text-pink-800 uppercase tracking-wider text-[10px] font-bold">
+                                        <th class="p-4">Data & Horário</th>
+                                        <th class="p-4">Cliente</th>
+                                        <th class="p-4">Procedimento</th>
+                                        <th class="p-4">Duração</th>
+                                        <th class="p-4">Valor</th>
+                                        <th class="p-4 text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-pink-100 font-medium">
+                                    <template x-for="item in adminBookings" :key="item.id">
+                                        <tr class="hover:bg-pink-50/40 transition-colors">
+                                            <td class="p-4 whitespace-nowrap">
+                                                <div class="font-bold text-pink-950" x-text="formatDateStr(item.data)"></div>
+                                                <div class="text-pink-700 font-bold text-[11px]" x-text="`⏰ ${item.horario_inicio} - ${item.horario_fim}`"></div>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="font-bold text-pink-950" x-text="item.cliente_nome"></div>
+                                                <div class="text-pink-700 flex items-center gap-1 text-[11px]">
+                                                    <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                                                    <span x-text="item.cliente_telefone"></span>
+                                                </div>
+                                            </td>
+                                            <td class="p-4 font-bold text-pink-900" x-text="item.servico"></td>
+                                            <td class="p-4 text-pink-800" x-text="item.duracao"></td>
+                                            <td class="p-4 font-bold text-pink-800 whitespace-nowrap" x-text="item.preco"></td>
+                                            <td class="p-4 text-right whitespace-nowrap space-x-1">
+                                                <a 
+                                                    :href="`https://wa.me/55${cleanPhone(item.cliente_telefone)}?text=Olá%20${encodeURIComponent(item.cliente_nome)},%20confirmamos%20seu%20agendamento%20para%20${formatDateStr(item.data)}%20às%20${item.horario_inicio}!%20Espaço%20Beauty`"
+                                                    target="_blank"
+                                                    title="WhatsApp Direct"
+                                                    class="p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg inline-flex items-center">
+                                                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                                                </a>
+                                                <button 
+                                                    @click="deleteBooking(item.id)" 
+                                                    title="Excluir Registro"
+                                                    class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg inline-flex items-center">
+                                                    <i class="fa-regular fa-trash-can text-sm"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-pink-200 py-6 text-center text-xs text-pink-800">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-pink-950 serif-title">Espaço Bruna Fellipe</span>
+                <span>•</span>
+                <span>Sex (09h-19h) | Sáb (07h-19h)</span>
+            </div>
+            <p>© 2026 Espaço Bruna Fellipe • Todos os direitos reservados</p>
+            <p>Feito por Site_spersonalizados❤️</p>
+        </div>
+    </footer>
+
+
+    <!-- MODAL CONFIGURAÇÃO SUPABASE -->
+    <div x-show="isConfigModalOpen" 
+         x-transition
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pink-950/60 backdrop-blur-sm" 
+         style="display: none;">
+        
+        <div @click.away="isConfigModalOpen = false" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-pink-200 relative max-h-[90vh] overflow-y-auto">
+            <button @click="isConfigModalOpen = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <h3 class="text-xl font-bold text-pink-950 serif-title">Configuração do Banco de Dados</h3>
+            </div>
+            <p class="text-xs text-pink-700 mb-6">Credenciais do projeto Supabase salvas na aplicação.</p>
+
+            <form @submit.prevent="saveSupabaseCredentials()" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-pink-900 mb-1">Project URL (Supabase)</label>
+                    <input 
+                        type="url" 
+                        x-model="supabaseUrl" 
+                        required
+                        class="w-full p-3 rounded-xl border border-pink-300 focus:border-pink-600 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-pink-900 mb-1">Publishable / Anon Key (Supabase)</label>
+                    <input 
+                        type="password" 
+                        x-model="supabaseAnonKey" 
+                        required
+                        class="w-full p-3 rounded-xl border border-pink-300 focus:border-pink-600 outline-none">
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-colors">
+                        Salvar Credenciais
+                    </button>
+                    <button type="button" @click="testConnection()" class="py-3 px-4 bg-pink-200 text-pink-950 rounded-xl font-bold hover:bg-pink-300">
+                        Testar Conexão
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-pink-100">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-pink-950 text-xs">Estrutura SQL da Tabela `agendas_bruna`</span>
+                    <button @click="copySqlScript()" class="text-xs text-pink-700 font-bold hover:underline flex items-center gap-1">
+                        <i class="fa-regular fa-copy"></i> Copiar SQL
+                    </button>
+                </div>
+                <pre class="bg-pink-950 text-pink-200 p-3.5 rounded-xl text-[10px] font-mono overflow-x-auto leading-relaxed border border-pink-900" x-text="sqlScript"></pre>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DE AUTENTICAÇÃO DO PAINEL -->
+    <div x-show="isAdminAuthModalOpen" 
+         x-transition
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pink-950/60 backdrop-blur-sm" 
+         style="display: none;">
+        
+        <div @click.away="isAdminAuthModalOpen = false" class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-pink-200 relative">
+            <button @click="isAdminAuthModalOpen = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-14 h-14 rounded-2xl bg-pink-100 text-pink-700 flex items-center justify-center text-2xl mx-auto mb-4 border border-pink-200 shadow-inner">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-pink-950 serif-title">Acesso Restrito</h3>
+                <p class="text-xs text-pink-700 mt-1">Informe a senha de acesso ao Painel de Controle.</p>
+            </div>
+
+            <form @submit.prevent="verifyAdminPassword()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-pink-900 uppercase tracking-wider mb-2">Senha de Acesso</label>
+                    <div class="relative">
+                        <input 
+                            :type="showAdminPassword ? 'text' : 'password'" 
+                            x-model="adminPasswordInput" 
+                            required
+                            placeholder="Digite a senha..."
+                            class="w-full px-4 py-3 pr-10 rounded-xl border border-pink-300 focus:border-pink-600 focus:ring-2 focus:ring-pink-500/20 outline-none text-xs sm:text-sm transition-all">
+                        <button 
+                            type="button" 
+                            @click="showAdminPassword = !showAdminPassword" 
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-pink-400 hover:text-pink-700 text-xs">
+                            <i class="fa-solid" :class="showAdminPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <template x-if="adminAuthError">
+                    <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                        <span x-text="adminAuthError"></span>
+                    </div>
+                </template>
+
+                <div class="pt-2">
+                    <button 
+                        type="submit" 
+                        class="w-full py-3 bg-pink-700 hover:bg-pink-800 text-white rounded-xl font-bold text-xs shadow-lg shadow-pink-700/30 transition-all flex items-center justify-center gap-2">
+                        <span>Entrar no Painel</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+            <p class="text-[10px] text-center text-pink-500 mt-4">Senha padrão inicial: <span class="font-mono font-bold text-pink-800">admin123</span></p>
+        </div>
+    </div>
+
+    <!-- MODAL ALTERAÇÃO DE SENHA -->
+    <div x-show="isChangePassModalOpen" 
+         x-transition
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pink-950/60 backdrop-blur-sm" 
+         style="display: none;">
+        
+        <div @click.away="isChangePassModalOpen = false" class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-pink-200 relative">
+            <button @click="isChangePassModalOpen = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-pink-100 text-pink-700 flex items-center justify-center text-xl mx-auto mb-3">
+                <i class="fa-solid fa-key"></i>
+            </div>
+
+            <div class="text-center mb-6">
+                <h3 class="text-lg font-bold text-pink-950 serif-title">Alterar Senha do Painel</h3>
+                <p class="text-xs text-pink-700 mt-0.5">Defina uma nova senha para proteger seu acesso.</p>
+            </div>
+
+            <form @submit.prevent="updateAdminPassword()" class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-pink-900 mb-1">Nova Senha</label>
+                    <input 
+                        type="password" 
+                        x-model="newPasswordInput" 
+                        required
+                        placeholder="Digite a nova senha..."
+                        class="w-full p-3 rounded-xl border border-pink-300 focus:border-pink-600 outline-none">
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="button" @click="isChangePassModalOpen = false" class="flex-1 py-2.5 border border-pink-300 rounded-xl font-bold text-pink-800 hover:bg-pink-50">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-pink-700 hover:bg-pink-800 text-white rounded-xl font-bold">
+                        Salvar Senha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- MODAL DETALHES DO SERVIÇO -->
+    <div x-show="isDetailModalOpen" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pink-950/60 backdrop-blur-sm" style="display: none;">
+        <div @click.away="isDetailModalOpen = false" class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+            <button @click="isDetailModalOpen = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <template x-if="modalService">
+                <div>
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-pink-700 bg-pink-100 px-3 py-1 rounded-full border border-pink-300">
+                        Descrição do Procedimento
+                    </span>
+                    <h3 class="text-2xl font-bold text-pink-950 serif-title mt-3 mb-2" x-text="modalService.title"></h3>
+
+                    <div class="flex items-center gap-4 text-xs font-semibold text-pink-900 mb-4 bg-pink-50 p-3 rounded-xl">
+                        <div>
+                            <span class="text-pink-500 block text-[10px] uppercase">Duração Estimada</span>
+                            <span class="text-pink-950" x-text="modalService.durationText"></span>
+                        </div>
+                        <div class="h-6 w-px bg-pink-200"></div>
+                        <div>
+                            <span class="text-pink-500 block text-[10px] uppercase">Valor Base</span>
+                            <span class="text-pink-800 font-bold" x-text="formatCurrency(modalService.price)"></span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs sm:text-sm text-pink-900 leading-relaxed mb-6" x-text="modalService.description"></p>
+
+                    <div class="flex justify-end gap-3 pt-3 border-t border-pink-100">
+                        <button @click="isDetailModalOpen = false" class="px-5 py-2.5 rounded-xl border border-pink-300 text-xs font-semibold text-pink-800">Fechar</button>
+                        <button 
+                            @click="selectService(modalService); isDetailModalOpen = false; goToStep2();"
+                            class="px-5 py-2.5 rounded-xl bg-pink-700 text-white text-xs font-semibold shadow-md hover:bg-pink-800">
+                            Selecionar Procedimento
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+
+    <!-- TOAST DE NOTIFICAÇÃO -->
+    <div 
+        x-show="toast.show" 
+        x-transition
+        class="fixed bottom-5 right-5 z-50 bg-pink-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-pink-800 text-xs font-semibold"
+        style="display: none;">
+        <i class="fa-solid fa-circle-check text-pink-400 text-lg"></i>
+        <span x-text="toast.message"></span>
+    </div>
+
+
+    <!-- ================= LÓGICA DA APLICAÇÃO (ALPINE.JS + SUPABASE) ================= -->
+    <script>
+        function supabaseBookingApp() {
+            return {
+                currentView: 'booking',
+                step: 1,
+
+                // Número do WhatsApp de atendimento
+                profWhatsApp: '5517992304528',
+
+                // CREDENCIAIS SUPABASE
+                supabaseUrl: 'https://rmbpggakqpiiqhfmnivb.supabase.co/rest/v1/',
+                supabaseAnonKey: 'sb_publishable_tOFGCJMNuL5dx1fcqcOYwg_A-mSRAmG',
+                supabaseClient: null,
+                isConnectedToSupabase: false,
+                isConfigModalOpen: false,
+
+                sqlScript: `CREATE TABLE IF NOT EXISTS agendas_bruna (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  cliente_nome TEXT NOT NULL,
+  cliente_telefone TEXT NOT NULL,
+  servico TEXT NOT NULL,
+  duracao TEXT NOT NULL,
+  preco TEXT NOT NULL,
+  data DATE NOT NULL,
+  horario_inicio TEXT NOT NULL,
+  horario_fim TEXT NOT NULL
+);
+
+ALTER TABLE agendas_bruna ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Leitura Publica" ON  agendas_bruna FOR SELECT USING (true);
+CREATE POLICY "Insercao Publica" ON agendas_bruna FOR INSERT WITH CHECK (true);
+CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
+
+                // PROCEDIMENTOS E VALORES ATUALIZADOS
+                services: [
+                    {
+                        id: 1,
+                        title: 'Design de sobrancelha',
+                        price: 45.00,
+                        durationText: '30 min',
+                        durationMinutes: 30,
+                        description: 'Design completo com alinhamento visagista para valorizar o olhar.'
+                    },
+                    {
+                        id: 2,
+                        title: 'Design de sobrancelha (limpeza)',
+                        price: 35.00,
+                        durationText: '30 min',
+                        durationMinutes: 30,
+                        description: 'Limpeza e manutenção do desenho natural da sobrancelha.'
+                    },
+                    {
+                        id: 3,
+                        title: 'Lavagem + escova (cabelo curto e médio)',
+                        price: 60.00,
+                        durationText: '40 min',
+                        durationMinutes: 40,
+                        description: 'Higienização profissional acompanhada de escovação modeladora para fios curtos e médios.'
+                    },
+                    {
+                        id: 4,
+                        title: 'Lavagem + escova (cabelo longo e extra longo)',
+                        price: 80.00,
+                        durationText: '45 min',
+                        durationMinutes: 45,
+                        description: 'Lavagem capilar completa e escova com acabamento impecável em cabelos longos.'
+                    },
+                    {
+                        id: 5,
+                        title: 'Escova (cabelo curto e médio)',
+                        price: 50.00,
+                        durationText: '30 min',
+                        durationMinutes: 30,
+                        description: 'Modelagem e escovação rápida para cabelos curtos a médios.'
+                    },
+                    {
+                        id: 6,
+                        title: 'Escova (cabelo longo e extra longo)',
+                        price: 70.00,
+                        durationText: '35 min',
+                        durationMinutes: 35,
+                        description: 'Escovação de cabelos longos e extra longos para brilho e alinhamento.'
+                    },
+                    {
+                        id: 7,
+                        title: 'Lavagem + escova e ondas (curto/médio)',
+                        price: 90.00,
+                        durationText: '45 min',
+                        durationMinutes: 45,
+                        description: 'Lavagem capilar, escovação e estilização de ondas (babyliss/waves) para curtos e médios.'
+                    },
+                    {
+                        id: 8,
+                        title: 'Lavagem + escova e ondas (longo/extra longo)',
+                        price: 100.00,
+                        durationText: '50 min',
+                        durationMinutes: 50,
+                        description: 'Lavagem completa, escovação e ondas duradouras para cabelos longos e extra longos.'
+                    },
+                    {
+                        id: 9,
+                        title: 'Escova e ondas (cabelo curto e médio)',
+                        price: 70.00,
+                        durationText: '35 min',
+                        durationMinutes: 35,
+                        description: 'Modelagem em ondas para cabelos curtos e médios.'
+                    },
+                    {
+                        id: 10,
+                        title: 'Escova e ondas (cabelo longo e extra longo)',
+                        price: 80.00,
+                        durationText: '45 min',
+                        durationMinutes: 45,
+                        description: 'Modelagem em ondas deslumbrantes para fios longos ou extra longos.'
+                    },
+                    {
+                        id: 11,
+                        title: 'Lavagem + penteado',
+                        price: 160.00,
+                        durationText: '1h',
+                        durationMinutes: 60,
+                        description: 'Lavagem capilar e construção de penteado personalizado para eventos.'
+                    },
+                    {
+                        id: 12,
+                        title: 'Penteado',
+                        price: 140.00,
+                        durationText: '50 min',
+                        durationMinutes: 50,
+                        description: 'Penteado elaborado para festas, formaturas e eventos.'
+                    },
+                    {
+                        id: 13,
+                        title: 'Make express (sem sombra)',
+                        price: 140.00,
+                        durationText: '45 min',
+                        durationMinutes: 45,
+                        description: 'Maquiagem leve, pele perfeita e acabamento elegante sem aplicação de sombras.'
+                    },
+                    {
+                        id: 14,
+                        title: 'Make social (completa)',
+                        price: 180.00,
+                        durationText: '1h',
+                        durationMinutes: 60,
+                        description: 'Maquiagem social sofisticada com técnicas completas de contorno, sombra e olhos.'
+                    },
+                    {
+                        id: 15,
+                        title: 'Make social e penteado',
+                        price: 320.00,
+                        durationText: '1h 45min',
+                        durationMinutes: 105,
+                        description: 'Combo completo de maquiagem social refinada e penteado para brilhar na festa.'
+                    },
+                    {
+                        id: 16,
+                        title: 'Make noiva civil',
+                        price: 250.00,
+                        durationText: '1h',
+                        durationMinutes: 60,
+                        description: 'Maquiagem técnica exclusiva para fotos e celebração de casamento civil.'
+                    },
+                    {
+                        id: 17,
+                        title: 'Pacote make e penteado noiva civil',
+                        price: 400.00,
+                        durationText: '2h',
+                        durationMinutes: 120,
+                        description: 'Produção completa de noiva civil (make + penteado sofisticado).'
+                    },
+                    {
+                        id: 18,
+                        title: 'Pacote Formanda',
+                        price: 390.00,
+                        durationText: '2h',
+                        durationMinutes: 120,
+                        description: 'Produção vip incluindo make, penteado, assessoria para troca do vestido e fotos.'
+                    }
+                ],
+
+                // Seleções do fluxo
+                selectedService: null,
+                selectedDate: null,
+                selectedTime: null,
+                clientName: '',
+                clientPhone: '',
+
+                // Calendário State
+                calendarYear: new Date().getFullYear(),
+                calendarMonth: new Date().getMonth(),
+
+                // Agendamentos ocupados no dia selecionado
+                dateBookings: [],
+                isLoadingSlots: false,
+                isSubmitting: false,
+
+                // Admin State
+                adminBookings: [],
+
+                // Modais & Toast
+                isDetailModalOpen: false,
+                modalService: null,
+                toast: { show: false, message: '' },
+
+                // Autenticação Admin
+                isAdminAuthenticated: false,
+                isAdminAuthModalOpen: false,
+                isChangePassModalOpen: false,
+                adminPasswordInput: '',
+                showAdminPassword: false,
+                adminAuthError: '',
+                adminPassword: localStorage.getItem('beauty_admin_password') || 'admin123',
+                newPasswordInput: '',
+
+                initApp() {
+                    this.selectedService = this.services[0];
+                    
+                    const savedUrl = localStorage.getItem('beauty_supabase_url');
+                    const savedKey = localStorage.getItem('beauty_supabase_key');
+                    if (savedUrl && savedKey) {
+                        this.supabaseUrl = savedUrl;
+                        this.supabaseAnonKey = savedKey;
+                    }
+
+                    this.initSupabase();
+                },
+
+                initSupabase() {
+                    const cleanUrl = (this.supabaseUrl || '').replace(/\/+$/, '').replace(/\/rest\/v1$/, '');
+                    if (window.supabase && cleanUrl && this.supabaseAnonKey) {
+                        try {
+                            this.supabaseClient = window.supabase.createClient(cleanUrl, this.supabaseAnonKey);
+                            this.isConnectedToSupabase = true;
+                        } catch (e) {
+                            console.warn('Erro ao inicializar cliente Supabase:', e);
+                            this.isConnectedToSupabase = false;
+                        }
+                    } else {
+                        this.isConnectedToSupabase = false;
+                    }
+                },
+
+                async testConnection() {
+                    if (!this.supabaseClient) this.initSupabase();
+                    try {
+                        const { data, error } = await this.supabaseClient.from('agendas_bruna').select('count').limit(1);
+                        if (error) throw error;
+                        this.isConnectedToSupabase = true;
+                        this.showToast('Conectado com sucesso ao Supabase!');
+                    } catch(e) {
+                        this.showToast('Erro ao testar conexão com a tabela agendas_bruna.');
+                    }
+                },
+
+                saveSupabaseCredentials() {
+                    localStorage.setItem('beauty_supabase_url', this.supabaseUrl.trim());
+                    localStorage.setItem('beauty_supabase_key', this.supabaseAnonKey.trim());
+                    this.initSupabase();
+                    this.testConnection();
+                    this.isConfigModalOpen = false;
+                },
+
+                openAdminTab() {
+                    if (this.isAdminAuthenticated) {
+                        this.currentView = 'admin';
+                        this.loadAllBookings();
+                    } else {
+                        this.adminPasswordInput = '';
+                        this.adminAuthError = '';
+                        this.isAdminAuthModalOpen = true;
+                    }
+                },
+
+                verifyAdminPassword() {
+                    if (this.adminPasswordInput === this.adminPassword) {
+                        this.isAdminAuthenticated = true;
+                        this.isAdminAuthModalOpen = false;
+                        this.adminPasswordInput = '';
+                        this.adminAuthError = '';
+                        this.currentView = 'admin';
+                        this.loadAllBookings();
+                        this.showToast('Acesso concedido ao Painel!');
+                    } else {
+                        this.adminAuthError = 'Senha incorreta. Tente novamente.';
+                    }
+                },
+
+                logoutAdmin() {
+                    this.isAdminAuthenticated = false;
+                    this.currentView = 'booking';
+                    this.showToast('Painel bloqueado com sucesso.');
+                },
+
+                updateAdminPassword() {
+                    if (!this.newPasswordInput || this.newPasswordInput.trim().length < 4) {
+                        this.showToast('A senha deve conter pelo menos 4 caracteres.');
+                        return;
+                    }
+                    this.adminPassword = this.newPasswordInput.trim();
+                    localStorage.setItem('beauty_admin_password', this.adminPassword);
+                    this.isChangePassModalOpen = false;
+                    this.newPasswordInput = '';
+                    this.showToast('Senha do painel atualizada com sucesso!');
+                },
+
+                copySqlScript() {
+                    navigator.clipboard.writeText(this.sqlScript).then(() => {
+                        this.showToast('SQL copiado para a área de transferência!');
+                    });
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.show = true;
+                    setTimeout(() => { this.toast.show = false; }, 3500);
+                },
+
+                selectService(service) {
+                    this.selectedService = service;
+                    this.selectedTime = null;
+                },
+
+                goToStep2() {
+                    if (!this.selectedService) return;
+                    this.step = 2;
+                },
+
+                openModal(service) {
+                    this.modalService = service;
+                    this.isDetailModalOpen = true;
+                },
+
+                get currentMonthYearName() {
+                    const date = new Date(this.calendarYear, this.calendarMonth, 1);
+                    return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+                },
+
+                get calendarBlanks() {
+                    const firstDayIndex = new Date(this.calendarYear, this.calendarMonth, 1).getDay();
+                    return Array.from({ length: firstDayIndex }, (_, i) => i);
+                },
+
+                get calendarDays() {
+                    const daysInMonth = new Date(this.calendarYear, this.calendarMonth + 1, 0).getDate();
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+
+                    const days = [];
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const dateObj = new Date(this.calendarYear, this.calendarMonth, day);
+                        const dateStr = dateObj.toISOString().split('T')[0];
+                        const dayOfWeek = dateObj.getDay(); // 0 = Dom, 1 = Seg, 5 = Sex, 6 = Sáb
+                        
+                        const isSunday = dayOfWeek === 0;
+                        const isMonToThu = dayOfWeek >= 1 && dayOfWeek <= 4;
+                        const isPast = dateObj < today;
+                        
+                        // Segunda a quinta a agenda fica fechada.
+                        // Sexta (5), Sábado (6) e Domingo (0) ficam abertos.
+                        const isDisabled = isPast || isMonToThu;
+                        const isToday = dateObj.getTime() === today.getTime();
+
+                        days.push({
+                            dayNumber: day,
+                            dateStr: dateStr,
+                            dayOfWeek: dayOfWeek,
+                            isDisabled: isDisabled,
+                            isSunday: isSunday,
+                            isToday: isToday
+                        });
+                    }
+                    return days;
+                },
+
+                get hasExtraTax() {
+                    if (!this.selectedDate) return false;
+                    const dateObj = new Date(this.selectedDate + 'T00:00:00');
+                    const dayOfWeek = dateObj.getDay();
+                    // Domingo possui taxa extra de 15%
+                    return dayOfWeek === 0;
+                },
+
+                calculateFinalPrice() {
+                    if (!this.selectedService) return 0;
+                    let price = this.selectedService.price;
+                    if (this.hasExtraTax) {
+                        price *= 1.15; // Adiciona 15% de taxa
+                    }
+                    return price;
+                },
+
+                get availableSlots() {
+                    if (!this.selectedDate) return [];
+                    const dateObj = new Date(this.selectedDate + 'T00:00:00');
+                    const dayOfWeek = dateObj.getDay();
+
+                    // Sexta: 09h às 19h
+                    // Sábado: 07h às 19h
+                    // Domingo: Horários de produção (08h às 18h)
+                    let startHour = 9;
+                    let endHour = 18; // último slot começa às 18:00
+
+                    if (dayOfWeek === 6) { // Sábado
+                        startHour = 7;
+                    } else if (dayOfWeek === 0) { // Domingo
+                        startHour = 8;
+                    }
+
+                    const slots = [];
+                    for (let h = startHour; h <= endHour; h++) {
+                        const hStr = h.toString().padStart(2, '0');
+                        slots.push(`${hStr}:00`);
+                        if (h !== endHour) {
+                            slots.push(`${hStr}:30`);
+                        }
+                    }
+                    return slots;
+                },
+
+                prevMonth() {
+                    if (this.calendarMonth === 0) {
+                        this.calendarMonth = 11;
+                        this.calendarYear--;
+                    } else {
+                        this.calendarMonth--;
+                    }
+                },
+
+                nextMonth() {
+                    if (this.calendarMonth === 11) {
+                        this.calendarMonth = 0;
+                        this.calendarYear++;
+                    } else {
+                        this.calendarMonth++;
+                    }
+                },
+
+                async onSelectDate(dayObj) {
+                    if (dayObj.isDisabled) return;
+                    this.selectedDate = dayObj.dateStr;
+                    this.selectedTime = null;
+                    await this.fetchBookingsForDate(this.selectedDate);
+                },
+
+                get selectedDateFormatted() {
+                    if (!this.selectedDate) return '';
+                    const parts = this.selectedDate.split('-');
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                },
+
+                timeToMinutes(timeStr) {
+                    if (!timeStr) return 0;
+                    const [h, m] = timeStr.split(':').map(Number);
+                    return h * 60 + m;
+                },
+
+                minutesToTime(mins) {
+                    const h = Math.floor(mins / 60).toString().padStart(2, '0');
+                    const m = (mins % 60).toString().padStart(2, '0');
+                    return `${h}:${m}`;
+                },
+
+                calculateEndTime(startTimeStr, durationMinutes) {
+                    if (!startTimeStr || !durationMinutes) return '';
+                    const startMins = this.timeToMinutes(startTimeStr);
+                    const endMins = startMins + durationMinutes;
+                    return this.minutesToTime(endMins);
+                },
+
+                getSlotStatus(slotStr) {
+                    if (!this.selectedService) return { available: false, reason: 'Selecione serviço' };
+
+                    const candidateStart = this.timeToMinutes(slotStr);
+                    const duration = this.selectedService.durationMinutes;
+                    const candidateEnd = candidateStart + duration;
+
+                    for (let booking of this.dateBookings) {
+                        const bStart = this.timeToMinutes(booking.horario_inicio);
+                        const bEnd = this.timeToMinutes(booking.horario_fim);
+
+                        if (candidateStart < bEnd && candidateEnd > bStart) {
+                            return { available: false, reason: 'Ocupado' };
+                        }
+                    }
+
+                    return { available: true, reason: 'Livre' };
+                },
+
+                async fetchBookingsForDate(dateStr) {
+                    this.isLoadingSlots = true;
+                    if (this.isConnectedToSupabase && this.supabaseClient) {
+                        try {
+                            const { data, error } = await this.supabaseClient
+                                .from('agendas_bruna')
+                                .select('*')
+                                .eq('data', dateStr);
+
+                            if (error) throw error;
+                            this.dateBookings = data || [];
+                        } catch (e) {
+                            console.error('Erro ao consultar Supabase:', e);
+                            this.fetchLocalBookingsForDate(dateStr);
+                        }
+                    } else {
+                        this.fetchLocalBookingsForDate(dateStr);
+                    }
+                    this.isLoadingSlots = false;
+                },
+
+                fetchLocalBookingsForDate(dateStr) {
+                    const local = JSON.parse(localStorage.getItem('beauty_local_bookings') || '[]');
+                    this.dateBookings = local.filter(b => b.data === dateStr);
+                },
+
+                async loadAllBookings() {
+                    if (this.isConnectedToSupabase && this.supabaseClient) {
+                        try {
+                            const { data, error } = await this.supabaseClient
+                                .from('agendas_bruna')
+                                .select('*')
+                                .order('data', { ascending: false });
+
+                            if (error) throw error;
+                            this.adminBookings = data || [];
+                            return;
+                        } catch (e) {
+                            console.error('Erro ao listar Supabase:', e);
+                        }
+                    }
+                    
+                    const local = JSON.parse(localStorage.getItem('beauty_local_bookings') || '[]');
+                    this.adminBookings = local;
+                },
+
+                async saveBookingAndRedirectWhatsApp() {
+                    this.isSubmitting = true;
+
+                    const endTimeStr = this.calculateEndTime(this.selectedTime, this.selectedService.durationMinutes);
+                    const finalPrice = this.calculateFinalPrice();
+                    const precoFormatted = this.formatCurrency(finalPrice);
+
+                    const bookingPayload = {
+                        cliente_nome: this.clientName.trim(),
+                        cliente_telefone: this.clientPhone.trim(),
+                        servico: this.selectedService.title,
+                        duracao: this.selectedService.durationText,
+                        preco: precoFormatted,
+                        data: this.selectedDate,
+                        horario_inicio: this.selectedTime,
+                        horario_fim: endTimeStr
+                    };
+
+                    if (this.isConnectedToSupabase && this.supabaseClient) {
+                        try {
+                            const { error } = await this.supabaseClient
+                                .from('agendas_bruna')
+                                .insert([bookingPayload]);
+
+                            if (error) throw error;
+                        } catch (e) {
+                            console.error('Erro ao inserir no Supabase, salvando local:', e);
+                        }
+                    }
+
+                    const localBookings = JSON.parse(localStorage.getItem('beauty_local_bookings') || '[]');
+                    localBookings.push({ id: Date.now(), ...bookingPayload });
+                    localStorage.setItem('beauty_local_bookings', JSON.stringify(localBookings));
+
+                    this.isSubmitting = false;
+
+                    const taxMsg = this.hasExtraTax ? '\n⚡ *Observação:* Inclui taxa de 15% (Domingo/Feriado/Fora de Horário).' : '';
+
+                    const msg = 
+`✨ *AGENDAMENTO REALIZADO - ESPAÇO BEAUTY* ✨
+
+💄 *Procedimento:* ${bookingPayload.servico}
+⏱️ *Duração:* ${bookingPayload.duracao} (${bookingPayload.horario_inicio} até ${bookingPayload.horario_fim})
+💰 *Valor Total:* ${bookingPayload.preco}${taxMsg}
+
+📅 *Data:* ${this.selectedDateFormatted}
+⏰ *Horário Início:* ${bookingPayload.horario_inicio}
+
+👤 *Cliente:* ${bookingPayload.cliente_nome}
+📱 *WhatsApp:* ${bookingPayload.cliente_telefone}
+
+Reserva solicitada no sistema! Te aguardo no espaço. 💖`;
+
+                    const whatsappUrl = `https://wa.me/${this.profWhatsApp}?text=${encodeURIComponent(msg)}`;
+
+                    this.showToast('Agendamento gravado com sucesso!');
+
+                    setTimeout(() => {
+                        window.location.href = whatsappUrl;
+                        this.step = 1;
+                        this.selectedTime = null;
+                        this.clientName = '';
+                        this.clientPhone = '';
+                    }, 600);
+                },
+
+                async deleteBooking(id) {
+                    if (this.isConnectedToSupabase && this.supabaseClient) {
+                        try {
+                            const { error } = await this.supabaseClient
+                                .from('agendas_bruna')
+                                .delete()
+                                .eq('id', id);
+
+                            if (!error) this.showToast('Registro excluído do banco!');
+                        } catch (e) {
+                            console.error('Erro ao excluir do Supabase:', e);
+                        }
+                    }
+
+                    let local = JSON.parse(localStorage.getItem('beauty_local_bookings') || '[]');
+                    local = local.filter(b => b.id !== id);
+                    localStorage.setItem('beauty_local_bookings', JSON.stringify(local));
+
+                    this.loadAllBookings();
+                },
+
+                calculateTotalRevenue() {
+                    return this.adminBookings.reduce((sum, item) => {
+                        const num = parseFloat((item.preco || '').replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
+                        return sum + num;
+                    }, 0);
+                },
+
+                todayBookingsCount() {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    return this.adminBookings.filter(b => b.data === todayStr).length;
+                },
+
+                formatPhoneInput(event) {
+                    let val = event.target.value.replace(/\D/g, '');
+                    if (val.length > 11) val = val.slice(0, 11);
+                    if (val.length > 10) {
+                        val = val.replace(/^(\d\d)(\d{5})(\d{4}).*/, '($1) $2-$3');
+                    } else if (val.length > 6) {
+                        val = val.replace(/^(\d\d)(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                    } else if (val.length > 2) {
+                        val = val.replace(/^(\d\d)(\d{0,5})/, '($1) $2');
+                    } else if (val.length > 0) {
+                        val = val.replace(/^(\d*)/, '($1');
+                    }
+                    this.clientPhone = val;
+                },
+
+                cleanPhone(phone) {
+                    return (phone || '').replace(/\D/g, '');
+                },
+
+                formatCurrency(val) {
+                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+                },
+
+                formatDateStr(dateIso) {
+                    if (!dateIso) return '';
+                    const parts = dateIso.split('-');
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
