@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espaço Beauty & Hair - Agendamento Online</title>
+    <title>Studio B - Agendamento Online</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -93,7 +93,7 @@
                 </div>
                 <div>
                     <span class="block text-xl font-bold tracking-tight text-pink-900 leading-none serif-title">
-                      Bruna Fellipe   <span class="text-xs font-normal font-sans italic text-pink-600 tracking-normal"> </span>
+                      Bruna Felippe   <span class="text-xs font-normal font-sans italic text-pink-600 tracking-normal"> </span>
                     </span>
                     <span class="text-[10px] uppercase tracking-widest text-pink-600/80 font-semibold block mt-0.5">Maquiadora💫</span>
                 </div>
@@ -160,8 +160,9 @@
                         <li><strong>Segunda a Quinta:</strong> Agenda fechada para público geral.</li>
                         <li><strong>Sexta:</strong> Atendimento regular das 09h às 19h | <strong>Sábado:</strong> das 07h às 19h.</li>
                         <li><strong>Domingos, Feriados e fora do horário comercial:</strong> Produções sob agendamento especial com <strong>taxa adicional de 15%</strong>.</li>
+                        <li><strong>Sinal de Reserva (30%):</strong> Para concluir e garantir o agendamento, é necessário pagar <strong>30% via Pix</strong> e enviar o comprovante no WhatsApp.</li>
                         <li><strong>Horários esporádicos fora da agenda:</strong> Podem ser solicitados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
-                        <li><strong>Noivas e Debutantes de cerimônia:</strong> Orçamentos personalizados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
+                        <li><strong>Debutantes Noivas  de cerimônia:</strong> Orçamentos personalizados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
                     </ul>
                 </div>
 
@@ -394,6 +395,18 @@
                                             </div>
                                         </template>
 
+                                        <template x-if="dateBookings.length > 0">
+                                            <div class="bg-pink-100/70 border border-pink-300 rounded-xl p-3 text-[11px] text-pink-950">
+                                                <p class="font-bold mb-1"><i class="fa-regular fa-calendar-xmark text-pink-600"></i> Já reservado neste dia:</p>
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    <template x-for="b in sortedDateBookings" :key="b.id">
+                                                        <span class="px-2 py-0.5 rounded-md bg-white border border-pink-300 font-semibold" x-text="`${b.horario_inicio.slice(0,5)} às ${b.horario_fim.slice(0,5)}`"></span>
+                                                    </template>
+                                                </div>
+                                                <p class="mt-1.5 text-pink-700">Cada horário abaixo mostra quando o seu procedimento terminaria.</p>
+                                            </div>
+                                        </template>
+
                                         <div class="grid grid-cols-3 gap-2">
                                             <template x-for="slot in availableSlots" :key="slot">
                                                 <button 
@@ -490,6 +503,7 @@
                                     <p class="text-pink-900 font-bold"><span class="font-semibold">Taxa Domingos/Feriados (+15%):</span> +<span x-text="formatCurrency((selectedService?.price || 0) * 0.15)"></span></p>
                                 </template>
                                 <p class="pt-1 border-t border-pink-300 text-sm font-extrabold text-pink-950"><span class="font-semibold">Valor Total:</span> <span x-text="formatCurrency(calculateFinalPrice())"></span></p>
+                                <p class="text-emerald-800 font-bold"><span class="font-semibold">Sinal para reserva (30% via Pix):</span> <span x-text="formatCurrency(calculateDeposit())"></span></p>
                             </div>
 
                             <div class="pt-3 flex justify-between gap-3">
@@ -501,7 +515,7 @@
                                     :disabled="!clientName.trim() || clientPhone.length < 14"
                                     :class="clientName.trim() && clientPhone.length >= 14 ? 'bg-pink-700 hover:bg-pink-800 text-white shadow-lg shadow-pink-700/30 font-bold' : 'bg-pink-200 text-pink-400 cursor-not-allowed'"
                                     class="px-6 py-3 rounded-xl text-xs font-semibold transition-all flex items-center gap-2">
-                                    <span>Revisar Agendamento</span>
+                                    <span>Avançar para Sinal (30%)</span>
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             </div>
@@ -509,7 +523,7 @@
                     </div>
                 </div>
 
-                <!-- PASSO 4: CONFIRMAÇÃO -->
+                <!-- PASSO 4: CONFIRMAÇÃO E PAGAMENTO DO SINAL (30%) -->
                 <div x-show="step === 4" x-transition:enter="transition ease-out duration-300 opacity-0 translate-y-4">
                     <div class="max-w-xl mx-auto bg-white rounded-3xl border border-pink-200 shadow-xl overflow-hidden">
                         
@@ -517,8 +531,8 @@
                             <div class="w-16 h-16 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white flex items-center justify-center text-2xl mx-auto mb-3">
                                 <i class="fa-solid fa-calendar-check text-pink-200"></i>
                             </div>
-                            <h2 class="text-2xl font-bold serif-title">Confirme seu Agendamento</h2>
-                            <p class="text-pink-100 text-xs mt-1">Sua vaga será reservada e confirmada no sistema!</p>
+                            <h2 class="text-2xl font-bold serif-title">Garanta seu Agendamento</h2>
+                            <p class="text-pink-100 text-xs mt-1">Pague o sinal de 30% via Pix e envie o comprovante no WhatsApp!</p>
                         </div>
 
                         <div class="p-6 space-y-6">
@@ -526,7 +540,7 @@
                             <div class="divide-y divide-pink-100 text-xs sm:text-sm">
                                 <div class="py-3 flex justify-between items-center">
                                     <span class="text-pink-700 text-xs uppercase font-bold">Serviço</span>
-                                    <span class="font-bold text-pink-950" x-text="selectedService?.title"></span>
+                                    <span class="font-bold text-pink-950 text-right" x-text="selectedService?.title"></span>
                                 </div>
                                 <div class="py-3 flex justify-between items-center">
                                     <span class="text-pink-700 text-xs uppercase font-bold">Duração</span>
@@ -544,31 +558,72 @@
                                     <span class="text-pink-700 text-xs uppercase font-bold">WhatsApp</span>
                                     <span class="font-semibold text-pink-900" x-text="clientPhone"></span>
                                 </div>
-                                <div class="py-4 flex justify-between items-center bg-pink-100/60 -mx-6 px-6 border-t border-b border-pink-200">
+                            </div>
+
+                            <!-- RESUMO FINANCEIRO COM SINAL DE 30% -->
+                            <div class="bg-pink-100/70 -mx-6 px-6 py-4 border-t border-b border-pink-200 space-y-2">
+                                <div class="flex justify-between items-center text-xs text-pink-900">
                                     <div>
-                                        <span class="text-pink-950 font-bold block">Valor Total</span>
+                                        <span>Valor Total do Procedimento:</span>
                                         <template x-if="hasExtraTax">
-                                            <span class="text-[10px] text-pink-800 font-semibold">(Inclui taxa de 15% para dom/feriado)</span>
+                                            <span class="block text-[10px] text-pink-800 font-semibold">(Inclui taxa de 15% para dom/feriado)</span>
                                         </template>
                                     </div>
-                                    <span class="text-2xl font-extrabold text-pink-800" x-text="formatCurrency(calculateFinalPrice())"></span>
+                                    <span class="font-bold" x-text="formatCurrency(calculateFinalPrice())"></span>
+                                </div>
+
+                                <div class="flex justify-between items-center text-sm font-extrabold text-pink-950 bg-white p-3 rounded-xl border border-pink-300 shadow-sm">
+                                    <div>
+                                        <span class="block">Sinal para Reserva (30%)</span>
+                                        <span class="text-[10px] font-normal text-pink-700">Pago agora via Pix para confirmar a vaga</span>
+                                    </div>
+                                    <span class="text-lg text-emerald-700" x-text="formatCurrency(calculateDeposit())"></span>
+                                </div>
+
+                                <div class="flex justify-between items-center text-xs text-pink-800 pt-1">
+                                    <span>Restante no dia do atendimento (70%):</span>
+                                    <span class="font-bold" x-text="formatCurrency(calculateRemaining())"></span>
+                                </div>
+                            </div>
+
+                            <!-- CAIXA DE PAGAMENTO PIX -->
+                            <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center gap-2 text-emerald-900 font-bold text-xs">
+                                    <i class="fa-brands fa-pix text-emerald-600 text-base"></i>
+                                    <span>Pagamento do Sinal (30%) via Pix</span>
+                                </div>
+                                
+                                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                                    Para concluir seu agendamento, realize o Pix de <strong x-text="formatCurrency(calculateDeposit())"></strong> e envie o comprovante no WhatsApp a seguir.
+                                </p>
+
+                                <div class="flex items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-emerald-300">
+                                    <div class="overflow-hidden">
+                                        <span class="block text-[10px] text-gray-500 uppercase font-bold">Chave Pix (<span x-text="pixTitular"></span>)</span>
+                                        <span class="text-xs font-mono font-bold text-gray-900 truncate block" x-text="pixKey"></span>
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        @click="copyPixKey()"
+                                        class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition-colors">
+                                        <i class="fa-regular fa-copy"></i> Copiar Pix
+                                    </button>
                                 </div>
                             </div>
 
                             <div class="space-y-3 pt-2">
-                                <!-- BOTÃO WHATSAPP EM VERDE DE ALTO CONTRASTE OU ROSA ESCURO IMPACTANTE -->
                                 <button 
                                     @click="saveBookingAndRedirectWhatsApp()"
                                     :disabled="isSubmitting"
-                                    class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base transition-all shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-3">
+                                    class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base transition-all shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-3">
                                     <template x-if="!isSubmitting">
                                         <div class="flex items-center gap-2">
                                             <i class="fa-brands fa-whatsapp text-2xl"></i>
-                                            <span>Confirmar e Enviar no WhatsApp</span>
+                                            <span>Reservar e Enviar Comprovante</span>
                                         </div>
                                     </template>
                                     <template x-if="isSubmitting">
-                                        <span><i class="fa-solid fa-spinner fa-spin"></i> Agendando...</span>
+                                        <span><i class="fa-solid fa-spinner fa-spin"></i> Registrando pré-reserva...</span>
                                     </template>
                                 </button>
 
@@ -599,7 +654,7 @@
                                 <i class="fa-solid fa-shield-check"></i> Autenticado
                             </span>
                         </div>
-                        <p class="text-xs text-pink-700">Gestão completa dos atendimentos e produções.</p>
+                        <p class="text-xs text-pink-700">Gestão completa dos atendimentos, sinais de 30% e produções.</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -682,17 +737,20 @@
                                         <th class="p-4">Cliente</th>
                                         <th class="p-4">Procedimento</th>
                                         <th class="p-4">Duração</th>
-                                        <th class="p-4">Valor</th>
+                                        <th class="p-4">Valores & Status</th>
                                         <th class="p-4 text-right">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-pink-100 font-medium">
                                     <template x-for="item in adminBookings" :key="item.id">
                                         <tr class="hover:bg-pink-50/40 transition-colors">
+                                            <!-- DATA E HORÁRIO -->
                                             <td class="p-4 whitespace-nowrap">
                                                 <div class="font-bold text-pink-950" x-text="formatDateStr(item.data)"></div>
                                                 <div class="text-pink-700 font-bold text-[11px]" x-text="`⏰ ${item.horario_inicio} - ${item.horario_fim}`"></div>
                                             </td>
+
+                                            <!-- CLIENTE -->
                                             <td class="p-4">
                                                 <div class="font-bold text-pink-950" x-text="item.cliente_nome"></div>
                                                 <div class="text-pink-700 flex items-center gap-1 text-[11px]">
@@ -700,17 +758,43 @@
                                                     <span x-text="item.cliente_telefone"></span>
                                                 </div>
                                             </td>
+
+                                            <!-- PROCEDIMENTO -->
                                             <td class="p-4 font-bold text-pink-900" x-text="item.servico"></td>
-                                            <td class="p-4 text-pink-800" x-text="item.duracao"></td>
-                                            <td class="p-4 font-bold text-pink-800 whitespace-nowrap" x-text="item.preco"></td>
+
+                                            <!-- DURAÇÃO -->
+                                            <td class="p-4 text-pink-800 whitespace-nowrap" x-text="item.duracao"></td>
+
+                                            <!-- VALORES (TOTAL, SINAL 30%, RESTANTE 70%) E STATUS -->
+                                            <td class="p-4 whitespace-nowrap">
+                                                <div class="font-extrabold text-pink-950" x-text="`Total: ${item.preco}`"></div>
+                                                <div class="text-[11px] text-emerald-700 font-bold" x-show="item.valor_sinal" x-text="`Sinal (30%): ${item.valor_sinal}`"></div>
+                                                <div class="text-[10px] text-pink-700" x-show="item.valor_restante" x-text="`Restante: ${item.valor_restante}`"></div>
+                                                <span 
+                                                    :class="item.status === 'Sinal Pago (Confirmado)' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-amber-100 text-amber-800 border-amber-300'"
+                                                    class="inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold border"
+                                                    x-text="item.status || 'Aguardando Sinal'">
+                                                </span>
+                                            </td>
+
+                                            <!-- AÇÕES -->
                                             <td class="p-4 text-right whitespace-nowrap space-x-1">
+                                                <button 
+                                                    x-show="item.status !== 'Sinal Pago (Confirmado)'"
+                                                    @click="confirmDeposit(item.id)" 
+                                                    title="Confirmar Pagamento do Sinal (30%)"
+                                                    class="px-2.5 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg inline-flex items-center gap-1 text-[11px] font-bold shadow-sm transition-colors">
+                                                    <i class="fa-solid fa-check"></i> Confirmar Pix
+                                                </button>
+
                                                 <a 
-                                                    :href="`https://wa.me/55${cleanPhone(item.cliente_telefone)}?text=Olá%20${encodeURIComponent(item.cliente_nome)},%20confirmamos%20seu%20agendamento%20para%20${formatDateStr(item.data)}%20às%20${item.horario_inicio}!%20Espaço%20Beauty`"
+                                                    :href="`https://wa.me/55${cleanPhone(item.cliente_telefone)}?text=Olá%20${encodeURIComponent(item.cliente_nome)},%20confirmamos%20o%20recebimento%20do%20sinal%20de%2030%25%20e%20seu%20agendamento%20para%20${formatDateStr(item.data)}%20às%20${item.horario_inicio}!%20Espaço%20Beauty`"
                                                     target="_blank"
                                                     title="WhatsApp Direct"
                                                     class="p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg inline-flex items-center">
                                                     <i class="fa-brands fa-whatsapp text-sm"></i>
                                                 </a>
+
                                                 <button 
                                                     @click="deleteBooking(item.id)" 
                                                     title="Excluir Registro"
@@ -734,11 +818,11 @@
     <footer class="bg-white border-t border-pink-200 py-6 text-center text-xs text-pink-800">
         <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2">
-                <span class="font-bold text-pink-950 serif-title">Espaço Bruna Fellipe</span>
+                <span class="font-bold text-pink-950 serif-title">Studio Bruna Felippe</span>
                 <span>•</span>
                 <span>Sex (09h-19h) | Sáb (07h-19h)</span>
             </div>
-            <p>© 2026 Espaço Bruna Fellipe • Todos os direitos reservados</p>
+            <p>© 2026 Espaço Bruna Felippe • Todos os direitos reservados</p>
             <p>Feito por Site_spersonalizados❤️</p>
         </div>
     </footer>
@@ -968,8 +1052,10 @@
                 currentView: 'booking',
                 step: 1,
 
-                // Número do WhatsApp de atendimento
+                // Número do WhatsApp e Dados Pix de atendimento
                 profWhatsApp: '5517992304528',
+                pixKey: '17992304528', // Substitua pela chave Pix oficial (CPF, CNPJ, e-mail, telefone ou aleatória)
+                pixTitular: 'Bruna Felippe',
 
                 // CREDENCIAIS SUPABASE
                 supabaseUrl: 'https://rmbpggakqpiiqhfmnivb.supabase.co/rest/v1/',
@@ -986,6 +1072,9 @@
   servico TEXT NOT NULL,
   duracao TEXT NOT NULL,
   preco TEXT NOT NULL,
+  valor_sinal TEXT,
+  valor_restante TEXT,
+  status TEXT DEFAULT 'Aguardando Sinal',
   data DATE NOT NULL,
   horario_inicio TEXT NOT NULL,
   horario_fim TEXT NOT NULL
@@ -994,13 +1083,14 @@
 ALTER TABLE agendas_bruna ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Leitura Publica" ON  agendas_bruna FOR SELECT USING (true);
 CREATE POLICY "Insercao Publica" ON agendas_bruna FOR INSERT WITH CHECK (true);
+CREATE POLICY "Atualizacao Publica" ON agendas_bruna FOR UPDATE USING (true);
 CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
 
                 // PROCEDIMENTOS E VALORES ATUALIZADOS
                 services: [
                     {
                         id: 1,
-                        title: 'Design de sobrancelha',
+                        title: '1° Design de sobrancelha',
                         price: 45.00,
                         durationText: '30 min',
                         durationMinutes: 30,
@@ -1060,7 +1150,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 100.00,
                         durationText: '50 min',
                         durationMinutes: 50,
-                        description: 'Lavagem completa, escovação e ondas duradouras para cabelos longos e extra longos.'
+                        description: 'Lavagem capilar completa, escovação e ondas duradouras para cabelos longos e extra longos.'
                     },
                     {
                         id: 9,
@@ -1100,7 +1190,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 140.00,
                         durationText: '45 min',
                         durationMinutes: 45,
-                        description: 'Maquiagem leve, pele perfeita e acabamento elegante sem aplicação de sombras.'
+                        description: 'Uma produção leve, natural e elegante, que realça sua belezasem excessos. Pele bem preparada, acabamento impecábel e olhos sem sombra, valorizando a beleza de forma delicada e sofisticada🤍. Perfeita para quem ama estar arrumada, mas sem parecer muito maquiada!'
                     },
                     {
                         id: 14,
@@ -1108,7 +1198,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 180.00,
                         durationText: '1h',
                         durationMinutes: 60,
-                        description: 'Maquiagem social sofisticada com técnicas completas de contorno, sombra e olhos.'
+                        description: 'Uma produção mais elaborada, com olhos marcados. sombras esfumadas e acabamento impecável. Ideal para quem deseja realçar o olhar, valorizar os traços e conquistar uma maquiagem elegante e marcante para ocasiões especiais.💄'
                     },
                     {
                         id: 15,
@@ -1275,6 +1365,12 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                     });
                 },
 
+                copyPixKey() {
+                    navigator.clipboard.writeText(this.pixKey).then(() => {
+                        this.showToast('Chave Pix copiada! Cole no aplicativo do seu banco.');
+                    });
+                },
+
                 showToast(msg) {
                     this.toast.message = msg;
                     this.toast.show = true;
@@ -1355,6 +1451,14 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                     return price;
                 },
 
+                calculateDeposit() {
+                    return this.calculateFinalPrice() * 0.30;
+                },
+
+                calculateRemaining() {
+                    return this.calculateFinalPrice() * 0.70;
+                },
+
                 get availableSlots() {
                     if (!this.selectedDate) return [];
                     const dateObj = new Date(this.selectedDate + 'T00:00:00');
@@ -1429,27 +1533,43 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                 calculateEndTime(startTimeStr, durationMinutes) {
                     if (!startTimeStr || !durationMinutes) return '';
                     const startMins = this.timeToMinutes(startTimeStr);
-                    const endMins = startMins + durationMinutes;
+                    const endMins = startMins + Number(durationMinutes);
                     return this.minutesToTime(endMins);
+                },
+
+                get sortedDateBookings() {
+                    return [...this.dateBookings].sort((x, y) => this.timeToMinutes(x.horario_inicio) - this.timeToMinutes(y.horario_inicio));
                 },
 
                 getSlotStatus(slotStr) {
                     if (!this.selectedService) return { available: false, reason: 'Selecione serviço' };
 
                     const candidateStart = this.timeToMinutes(slotStr);
-                    const duration = this.selectedService.durationMinutes;
+                    const duration = Number(this.selectedService.durationMinutes);
                     const candidateEnd = candidateStart + duration;
+
+                    // Impede que o procedimento ultrapasse o horário de fechamento
+                    const dateObj = new Date(this.selectedDate + 'T00:00:00');
+                    const dayOfWeek = dateObj.getDay();
+                    const closingMinutes = dayOfWeek === 0 ? 18 * 60 : 19 * 60;
+
+                    if (candidateEnd > closingMinutes) {
+                        return { available: false, reason: 'Sem tempo' };
+                    }
 
                     for (let booking of this.dateBookings) {
                         const bStart = this.timeToMinutes(booking.horario_inicio);
                         const bEnd = this.timeToMinutes(booking.horario_fim);
 
                         if (candidateStart < bEnd && candidateEnd > bStart) {
-                            return { available: false, reason: 'Ocupado' };
+                            // Começa dentro de uma reserva = Ocupado.
+                            // Começa livre mas invade uma reserva seguinte = Sem tempo.
+                            const startsInside = candidateStart >= bStart;
+                            return { available: false, reason: startsInside ? 'Ocupado' : 'Sem tempo' };
                         }
                     }
 
-                    return { available: true, reason: 'Livre' };
+                    return { available: true, reason: `até ${this.minutesToTime(candidateEnd)}` };
                 },
 
                 async fetchBookingsForDate(dateStr) {
@@ -1501,9 +1621,15 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                 async saveBookingAndRedirectWhatsApp() {
                     this.isSubmitting = true;
 
-                    const endTimeStr = this.calculateEndTime(this.selectedTime, this.selectedService.durationMinutes);
+                    const durationMins = Number(this.selectedService.durationMinutes);
+                    const endTimeStr = this.calculateEndTime(this.selectedTime, durationMins);
                     const finalPrice = this.calculateFinalPrice();
+                    const depositPrice = this.calculateDeposit();
+                    const remainingPrice = this.calculateRemaining();
+
                     const precoFormatted = this.formatCurrency(finalPrice);
+                    const sinalFormatted = this.formatCurrency(depositPrice);
+                    const restanteFormatted = this.formatCurrency(remainingPrice);
 
                     const bookingPayload = {
                         cliente_nome: this.clientName.trim(),
@@ -1511,6 +1637,9 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         servico: this.selectedService.title,
                         duracao: this.selectedService.durationText,
                         preco: precoFormatted,
+                        valor_sinal: sinalFormatted,
+                        valor_restante: restanteFormatted,
+                        status: 'Aguardando Sinal',
                         data: this.selectedDate,
                         horario_inicio: this.selectedTime,
                         horario_fim: endTimeStr
@@ -1537,23 +1666,24 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                     const taxMsg = this.hasExtraTax ? '\n⚡ *Observação:* Inclui taxa de 15% (Domingo/Feriado/Fora de Horário).' : '';
 
                     const msg = 
-`✨ *AGENDAMENTO REALIZADO - ESPAÇO BEAUTY* ✨
+`✨ *PRÉ-RESERVA REALIZADA - Studio Bruna Felippe* ✨
 
 💄 *Procedimento:* ${bookingPayload.servico}
 ⏱️ *Duração:* ${bookingPayload.duracao} (${bookingPayload.horario_inicio} até ${bookingPayload.horario_fim})
-💰 *Valor Total:* ${bookingPayload.preco}${taxMsg}
-
 📅 *Data:* ${this.selectedDateFormatted}
-⏰ *Horário Início:* ${bookingPayload.horario_inicio}
+
+💰 *Valor Total:* ${precoFormatted}
+✅ *Sinal (30%):* ${sinalFormatted}
+⏳ *Restante no dia (70%):* ${restanteFormatted}${taxMsg}
 
 👤 *Cliente:* ${bookingPayload.cliente_nome}
 📱 *WhatsApp:* ${bookingPayload.cliente_telefone}
 
-Reserva solicitada no sistema! Te aguardo no espaço. 💖`;
+📎 *Estou enviando o comprovante do Pix de 30% abaixo para confirmar meu horário!* 💖`;
 
                     const whatsappUrl = `https://wa.me/${this.profWhatsApp}?text=${encodeURIComponent(msg)}`;
 
-                    this.showToast('Agendamento gravado com sucesso!');
+                    this.showToast('Pré-reserva salva! Envie o comprovante no WhatsApp.');
 
                     setTimeout(() => {
                         window.location.href = whatsappUrl;
@@ -1562,6 +1692,27 @@ Reserva solicitada no sistema! Te aguardo no espaço. 💖`;
                         this.clientName = '';
                         this.clientPhone = '';
                     }, 600);
+                },
+
+                async confirmDeposit(id) {
+                    if (this.isConnectedToSupabase && this.supabaseClient) {
+                        try {
+                            const { error } = await this.supabaseClient
+                                .from('agendas_bruna')
+                                .update({ status: 'Sinal Pago (Confirmado)' })
+                                .eq('id', id);
+
+                            if (!error) this.showToast('Pagamento de 30% confirmado!');
+                        } catch (e) {
+                            console.error('Erro ao atualizar status no Supabase:', e);
+                        }
+                    }
+
+                    let local = JSON.parse(localStorage.getItem('beauty_local_bookings') || '[]');
+                    local = local.map(b => b.id === id ? { ...b, status: 'Sinal Pago (Confirmado)' } : b);
+                    localStorage.setItem('beauty_local_bookings', JSON.stringify(local));
+
+                    this.loadAllBookings();
                 },
 
                 async deleteBooking(id) {
