@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio B - Agendamento Online</title>
+    <title>Studio Bruna Felippe - Agendamento Online</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -93,7 +93,7 @@
                 </div>
                 <div>
                     <span class="block text-xl font-bold tracking-tight text-pink-900 leading-none serif-title">
-                      Bruna Felippe   <span class="text-xs font-normal font-sans italic text-pink-600 tracking-normal"> </span>
+                      Bruna Felippe <span class="text-xs font-normal font-sans italic text-pink-600 tracking-normal"></span>
                     </span>
                     <span class="text-[10px] uppercase tracking-widest text-pink-600/80 font-semibold block mt-0.5">Maquiadora💫</span>
                 </div>
@@ -159,10 +159,10 @@
                     <ul class="list-disc list-inside space-y-1 text-xs text-pink-900 pl-1">
                         <li><strong>Segunda a Quinta:</strong> Agenda fechada para público geral.</li>
                         <li><strong>Sexta:</strong> Atendimento regular das 09h às 19h | <strong>Sábado:</strong> das 07h às 19h.</li>
-                        <li><strong>Domingos, Feriados e fora do horário comercial:</strong> Produções sob agendamento especial com <strong>taxa adicional de 15%</strong>.</li>
+                        <li><strong>Domingos, feriados e fora do horário comercial:</strong> Produções sob agendamento especial com <strong>taxa adicional de 15%</strong>.</li>
                         <li><strong>Sinal de Reserva (30%):</strong> Para concluir e garantir o agendamento, é necessário pagar <strong>30% via Pix</strong> e enviar o comprovante no WhatsApp.</li>
-                        <li><strong>Horários esporádicos fora da agenda:</strong> Podem ser solicitados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
-                        <li><strong>Debutantes Noivas  de cerimônia:</strong> Orçamentos personalizados via <a href="https://wa.me/5517999999999" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
+                        <li><strong>Horários esporádicos fora da agenda:</strong> Podem ser solicitados via <a href="https://wa.me/5517992304528" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
+                        <li><strong>Debutantes e Noivas de cerimônia:</strong> Orçamentos personalizados via <a href="https://wa.me/5517992304528" target="_blank" class="text-pink-700 font-bold underline"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>.</li>
                     </ul>
                 </div>
 
@@ -281,7 +281,7 @@
                             <h2 class="text-xl font-bold text-pink-950 serif-title">Escolha a Data e Horário</h2>
                             <p class="text-xs text-pink-700">
                                 Atendimento regular: <span class="font-bold text-pink-800">Sexta (09h-19h)</span> e <span class="font-bold text-pink-800">Sábado (07h-19h)</span>. 
-                                Domingos e Feriados possuem taxa de +15%.
+                                Domingos e feriados possuem taxa de +15%.
                             </p>
                         </div>
                         <button @click="step = 1" class="text-xs text-pink-700 font-semibold hover:underline flex items-center gap-1">
@@ -403,7 +403,7 @@
                                                         <span class="px-2 py-0.5 rounded-md bg-white border border-pink-300 font-semibold" x-text="`${b.horario_inicio.slice(0,5)} às ${b.horario_fim.slice(0,5)}`"></span>
                                                     </template>
                                                 </div>
-                                                <p class="mt-1.5 text-pink-700">Cada horário abaixo mostra quando o seu procedimento terminaria.</p>
+                                                <p class="mt-1.5 text-pink-700">Cada horário abaixo mostra quando o seu procedimento terminará.</p>
                                             </div>
                                         </template>
 
@@ -450,7 +450,7 @@
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h2 class="text-xl font-bold text-pink-950 serif-title">Seus Dados de Contato</h2>
-                            <p class="text-xs text-pink-700">Preencha com seus dados para concluir a reserva.</p>
+                            <p class="text-xs text-pink-700">Preencha seus dados para concluir a reserva.</p>
                         </div>
                         <button @click="step = 2" class="text-xs text-pink-700 font-semibold hover:underline flex items-center gap-1">
                             <i class="fa-solid fa-arrow-left"></i> Alterar Horário
@@ -500,7 +500,7 @@
                                 <p><span class="font-semibold">Data & Horário:</span> <span x-text="`${selectedDateFormatted} às ${selectedTime} (até ${calculateEndTime(selectedTime, selectedService?.durationMinutes)})`"></span></p>
                                 <p><span class="font-semibold">Valor Base:</span> <span x-text="formatCurrency(selectedService?.price || 0)"></span></p>
                                 <template x-if="hasExtraTax">
-                                    <p class="text-pink-900 font-bold"><span class="font-semibold">Taxa Domingos/Feriados (+15%):</span> +<span x-text="formatCurrency((selectedService?.price || 0) * 0.15)"></span></p>
+                                    <p class="text-pink-900 font-bold"><span class="font-semibold">Taxa de domingos/feriados (+15%):</span> +<span x-text="formatCurrency((selectedService?.price || 0) * 0.15)"></span></p>
                                 </template>
                                 <p class="pt-1 border-t border-pink-300 text-sm font-extrabold text-pink-950"><span class="font-semibold">Valor Total:</span> <span x-text="formatCurrency(calculateFinalPrice())"></span></p>
                                 <p class="text-emerald-800 font-bold"><span class="font-semibold">Sinal para reserva (30% via Pix):</span> <span x-text="formatCurrency(calculateDeposit())"></span></p>
@@ -788,7 +788,7 @@
                                                 </button>
 
                                                 <a 
-                                                    :href="`https://wa.me/55${cleanPhone(item.cliente_telefone)}?text=Olá%20${encodeURIComponent(item.cliente_nome)},%20confirmamos%20o%20recebimento%20do%20sinal%20de%2030%25%20e%20seu%20agendamento%20para%20${formatDateStr(item.data)}%20às%20${item.horario_inicio}!%20Studio%20B`"
+                                                    :href="`https://wa.me/55${cleanPhone(item.cliente_telefone)}?text=Olá%20${encodeURIComponent(item.cliente_nome)},%20confirmamos%20o%20recebimento%20do%20sinal%20de%2030%25%20e%20seu%20agendamento%20para%20${formatDateStr(item.data)}%20às%20${item.horario_inicio}!%20Studio%20Bruna%20Felippe`"
                                                     target="_blank"
                                                     title="WhatsApp Direct"
                                                     class="p-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg inline-flex items-center">
@@ -1081,7 +1081,7 @@
 );
 
 ALTER TABLE agendas_bruna ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Leitura Publica" ON  agendas_bruna FOR SELECT USING (true);
+CREATE POLICY "Leitura Publica" ON agendas_bruna FOR SELECT USING (true);
 CREATE POLICY "Insercao Publica" ON agendas_bruna FOR INSERT WITH CHECK (true);
 CREATE POLICY "Atualizacao Publica" ON agendas_bruna FOR UPDATE USING (true);
 CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
@@ -1090,7 +1090,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                 services: [
                     {
                         id: 1,
-                        title: '1° Design de sobrancelha',
+                        title: '1º Design de sobrancelha',
                         price: 45.00,
                         durationText: '30 min',
                         durationMinutes: 30,
@@ -1190,7 +1190,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 140.00,
                         durationText: '45 min',
                         durationMinutes: 45,
-                        description: 'Uma produção leve, natural e elegante, que realça sua belezasem excessos. Pele bem preparada, acabamento impecábel e olhos sem sombra, valorizando a beleza de forma delicada e sofisticada🤍. Perfeita para quem ama estar arrumada, mas sem parecer muito maquiada!'
+                        description: 'Uma produção leve, natural e elegante, que realça sua beleza sem excessos. Pele bem preparada, acabamento impecável e olhos sem sombra, valorizando a beleza de forma delicada e sofisticada 🤍. Perfeita para quem ama estar arrumada, mas sem parecer muito maquiada!'
                     },
                     {
                         id: 14,
@@ -1198,7 +1198,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 180.00,
                         durationText: '1h',
                         durationMinutes: 60,
-                        description: 'Uma produção mais elaborada, com olhos marcados. sombras esfumadas e acabamento impecável. Ideal para quem deseja realçar o olhar, valorizar os traços e conquistar uma maquiagem elegante e marcante para ocasiões especiais.💄'
+                        description: 'Uma produção mais elaborada, com olhos marcados, sombras esfumadas e acabamento impecável. Ideal para quem deseja realçar o olhar, valorizar os traços e conquistar uma maquiagem elegante e marcante para ocasiões especiais. 💄'
                     },
                     {
                         id: 15,
@@ -1230,7 +1230,7 @@ CREATE POLICY "Exclusao Publica" ON agendas_bruna FOR DELETE USING (true);`,
                         price: 390.00,
                         durationText: '2h',
                         durationMinutes: 120,
-                        description: 'Produção vip incluindo make, penteado, assessoria para troca do vestido e fotos.'
+                        description: 'Produção VIP, incluindo make, penteado, assessoria para troca do vestido e fotos.'
                     }
                 ],
 
